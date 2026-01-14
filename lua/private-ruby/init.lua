@@ -103,13 +103,20 @@ function M.setup(opts)
     end,
   })
 
-  -- User command
+  -- User commands
   vim.api.nvim_create_user_command('PrivateRubyRefresh', function()
     local bufnr = vim.api.nvim_get_current_buf()
     if vim.bo[bufnr].filetype == 'ruby' then
       M.refresh(bufnr)
     end
   end, { desc = 'Refresh private method indicators' })
+
+  vim.api.nvim_create_user_command('PrivateRubyClear', function()
+    local bufnr = vim.api.nvim_get_current_buf()
+    if vim.bo[bufnr].filetype == 'ruby' then
+      M.clear(bufnr)
+    end
+  end, { desc = 'Clear private method indicators' })
 
   -- Apply to any existing Ruby buffers
   for _, bufnr in ipairs(vim.api.nvim_list_bufs()) do
