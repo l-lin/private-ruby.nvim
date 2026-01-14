@@ -40,6 +40,10 @@ local config = vim.deepcopy(defaults)
 ---@param opts? PrivateRubyConfig User options
 function M.setup(opts)
   opts = opts or {}
+  -- Ensure opts.indicator is a table (or nil) to avoid tbl_deep_extend errors
+  if opts.indicator ~= nil and type(opts.indicator) ~= 'table' then
+    opts.indicator = nil
+  end
   config = vim.tbl_deep_extend('force', defaults, opts)
 end
 
