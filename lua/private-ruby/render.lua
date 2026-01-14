@@ -40,10 +40,4 @@ function M.render(bufnr, marks, cfg)
   end
 end
 
---- Get the namespace ID (for testing)
----@return integer
-function M.get_namespace()
-  return get_namespace()
-end
-
 return M
