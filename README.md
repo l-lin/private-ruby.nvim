@@ -20,10 +20,10 @@ Shows private Ruby methods with ghosttext indicators in Neovim.
 require('private_ruby').setup({
   enabled = true,
   indicator = {
-    text = '🔒',           -- Indicator text
+    text = '',           -- Indicator text
     hl = 'DiagnosticHint', -- Highlight group
     position = 'eol',      -- Virtual text position
-    prefix = ' ',          -- Prefix before indicator
+    prefix = '',          -- Prefix before indicator
     -- Optional custom formatter:
     -- format = function(ctx)
     --   return ctx.is_singleton and '🔒 class' or '🔒'

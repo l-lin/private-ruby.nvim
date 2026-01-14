@@ -31,11 +31,6 @@ function M.refresh(bufnr)
   bufnr = bufnr or vim.api.nvim_get_current_buf()
   local cfg = config.get()
 
-  if not cfg.enabled then
-    render.clear(bufnr)
-    return
-  end
-
   local marks = detect.detect(bufnr)
 
   -- Format marks with text

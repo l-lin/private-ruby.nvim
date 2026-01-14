@@ -20,12 +20,10 @@ local M = {}
 ---@field format? fun(ctx: PrivateRubyContext): string Custom formatter
 
 ---@class PrivateRubyConfig
----@field enabled boolean Enable the plugin
 ---@field indicator PrivateRubyIndicator Indicator options
 
 ---@type PrivateRubyConfig
 local defaults = {
-  enabled = true,
   indicator = {
     text = '',
     hl = 'DiagnosticError',
