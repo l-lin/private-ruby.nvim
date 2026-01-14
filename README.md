@@ -4,11 +4,11 @@ Shows private Ruby methods with ghosttext indicators in Neovim.
 
 ## Installation
 
-### lazy.nvim
+### [lazy.nvim](https://lazy.folke.io/)
 
 ```lua
 {
-  'your-username/private-ruby.nvim',
+  'l-lin/private-ruby.nvim',
   ft = 'ruby',
   opts = {},
 }
@@ -17,7 +17,7 @@ Shows private Ruby methods with ghosttext indicators in Neovim.
 ## Configuration
 
 ```lua
-require('private_ruby').setup({
+{
   enabled = true,
   indicator = {
     text = '',           -- Indicator text
@@ -26,10 +26,10 @@ require('private_ruby').setup({
     prefix = '',          -- Prefix before indicator
     -- Optional custom formatter:
     -- format = function(ctx)
-    --   return ctx.is_singleton and '🔒 class' or '🔒'
+    --   return ctx.is_singleton and ' class' or ' '
     -- end,
   },
-})
+}
 ```
 
 ### Format function context
