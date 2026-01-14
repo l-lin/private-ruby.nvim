@@ -3,6 +3,15 @@
 
 local M = {}
 
+---@class PrivateRubyScope
+---@field kind string 'module' | 'class' | 'singleton'
+---@field name? string Name of module/class
+
+---@class PrivateRubyContext
+---@field method_name string Method name
+---@field is_singleton boolean Whether it's a singleton method
+---@field scope PrivateRubyScope[] Enclosing scopes
+
 ---@class PrivateRubyIndicator
 ---@field text string Default indicator text
 ---@field hl string Highlight group
@@ -18,10 +27,10 @@ local M = {}
 local defaults = {
   enabled = true,
   indicator = {
-    text = '🔒',
-    hl = 'DiagnosticHint',
+    text = '',
+    hl = 'DiagnosticError',
     position = 'eol',
-    prefix = ' ',
+    prefix = '',
     format = nil,
   },
 }
