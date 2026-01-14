@@ -24,6 +24,12 @@ local PATTERNS = {
   class = '^%s*class%s+([A-Z][%w_:]*)',
   singleton_block = '^%s*class%s*<<%s*self%s*',
 
+  -- Block openers (do blocks need tracking for proper end matching)
+  -- Matches: do at end of line (with optional comment)
+  block_do = '%s+do%s*$',
+  block_do_with_comment = '%s+do%s+#',
+  block_do_with_pipes = '%s+do%s*|',
+
   -- Method definitions
   -- Matches: def foo, def foo!, def foo?, def foo=, def +, def [], def []=, etc.
   instance_method = '^%s*def%s+([a-zA-Z_][%w_]*[!?=]?)',
@@ -47,7 +53,7 @@ local PATTERNS = {
 }
 
 ---@class ScopeFrame
----@field kind string 'module' | 'class' | 'singleton' | 'method'
+---@field kind string 'module' | 'class' | 'singleton' | 'method' | 'block'
 ---@field name? string Name of module/class
 ---@field visibility string 'public' | 'protected' | 'private'
 
@@ -73,10 +79,11 @@ function M.detect(bufnr)
   ---@type ScopeFrame[]
   local scope_stack = {}
 
-  -- Helper to find the nearest non-method scope
+  -- Helper to find the nearest non-method/non-block scope
   local function find_enclosing_scope()
     for i = #scope_stack, 1, -1 do
-      if scope_stack[i].kind ~= 'method' then
+      local kind = scope_stack[i].kind
+      if kind ~= 'method' and kind ~= 'block' then
         return scope_stack[i]
       end
     end
@@ -110,12 +117,13 @@ function M.detect(bufnr)
     return false
   end
 
-  -- Helper to build scope info for context (excludes method frames)
+  -- Helper to build scope info for context (excludes method/block frames)
   local function build_scope()
     local scope = {}
     for _, frame in ipairs(scope_stack) do
-      if frame.kind ~= 'method' then
-        table.insert(scope, { kind = frame.kind, name = frame.name })
+      local kind = frame.kind
+      if kind ~= 'method' and kind ~= 'block' then
+        table.insert(scope, { kind = kind, name = frame.name })
       end
     end
     return scope
@@ -205,6 +213,17 @@ function M.detect(bufnr)
       if not endless then
         table.insert(scope_stack, new_frame('method', method_name))
       end
+      goto continue
+    end
+
+    -- Check for do blocks (need to track for proper end matching)
+    -- Must check BEFORE end pattern to properly balance do/end
+    if
+      line:match(PATTERNS.block_do)
+      or line:match(PATTERNS.block_do_with_comment)
+      or line:match(PATTERNS.block_do_with_pipes)
+    then
+      table.insert(scope_stack, new_frame('block', nil))
       goto continue
     end
 

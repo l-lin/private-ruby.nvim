@@ -336,4 +336,27 @@ T['detect']['endless.rb']['scope tracking works after endless methods'] = functi
   expect.equality(vim.tbl_contains(method_names, 'back_to_public'), false)
 end
 
+T['detect']['blocks.rb'] = new_set()
+
+T['detect']['blocks.rb']['do/end blocks do not break scope tracking'] = function()
+  -- GIVEN: blocks.rb with lambda do/end blocks before private section
+  local bufnr = load_fixture('blocks.rb')
+  local detect = require('private-ruby.detect')
+
+  -- WHEN: calling detect
+  local marks = detect.detect(bufnr)
+
+  -- THEN: all three private methods are detected
+  local method_names = get_method_names(marks)
+  expect.equality(vim.tbl_contains(method_names, 'private_one'), true)
+  expect.equality(vim.tbl_contains(method_names, 'private_two'), true)
+  expect.equality(vim.tbl_contains(method_names, 'private_three'), true)
+
+  -- Public method should not be marked
+  expect.equality(vim.tbl_contains(method_names, 'public_method'), false)
+
+  -- Total count should be exactly 3
+  expect.equality(#marks, 3)
+end
+
 return T
