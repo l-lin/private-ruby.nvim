@@ -29,6 +29,10 @@ end
 ---@param bufnr? integer Buffer number (defaults to current)
 function M.refresh(bufnr)
   bufnr = bufnr or vim.api.nvim_get_current_buf()
+  if not vim.api.nvim_buf_is_valid(bufnr) then
+    return
+  end
+
   local cfg = config.get()
 
   local marks = detect.detect(bufnr)
@@ -46,6 +50,9 @@ end
 ---@param bufnr? integer Buffer number (defaults to current)
 function M.clear(bufnr)
   bufnr = bufnr or vim.api.nvim_get_current_buf()
+  if not vim.api.nvim_buf_is_valid(bufnr) then
+    return
+  end
   render.clear(bufnr)
 end
 
