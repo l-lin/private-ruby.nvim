@@ -11,10 +11,13 @@ local M = {}
 
 -- Patterns for Ruby constructs
 local PATTERNS = {
-  -- Visibility directives (standalone on a line)
-  private = '^%s*private%s*[#]?.*$',
-  public = '^%s*public%s*[#]?.*$',
-  protected = '^%s*protected%s*[#]?.*$',
+  -- Visibility directives (standalone keyword, optionally followed by comment)
+  private = '^%s*private%s*$',
+  private_with_comment = '^%s*private%s+#',
+  public = '^%s*public%s*$',
+  public_with_comment = '^%s*public%s+#',
+  protected = '^%s*protected%s*$',
+  protected_with_comment = '^%s*protected%s+#',
 
   -- Scope openers
   module = '^%s*module%s+([A-Z][%w_]*)',
@@ -136,15 +139,15 @@ function M.detect(bufnr)
     end
 
     -- Check for visibility directives
-    if match(line, PATTERNS.private) then
+    if match(line, PATTERNS.private) or match(line, PATTERNS.private_with_comment) then
       set_visibility('private')
       goto continue
     end
-    if match(line, PATTERNS.public) then
+    if match(line, PATTERNS.public) or match(line, PATTERNS.public_with_comment) then
       set_visibility('public')
       goto continue
     end
-    if match(line, PATTERNS.protected) then
+    if match(line, PATTERNS.protected) or match(line, PATTERNS.protected_with_comment) then
       set_visibility('protected')
       goto continue
     end
