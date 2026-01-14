@@ -20,7 +20,7 @@ local PATTERNS = {
   protected_with_comment = '^%s*protected%s+#',
 
   -- Scope openers
-  module = '^%s*module%s+([A-Z][%w_]*)',
+  module = '^%s*module%s+([A-Z][%w_:]*)',
   class = '^%s*class%s+([A-Z][%w_:]*)',
   singleton_block = '^%s*class%s*<<%s*self%s*',
 
