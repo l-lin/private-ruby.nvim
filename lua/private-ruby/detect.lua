@@ -28,8 +28,9 @@ local PATTERNS = {
   instance_method = '^%s*def%s+([a-zA-Z_][%w_]*[!?=]?)',
   singleton_method = '^%s*def%s+self%.([a-zA-Z_][%w_]*[!?=]?)',
 
-  -- Scope closer
-  scope_end = '^%s*end%s*',
+  -- Scope closer (end as standalone keyword)
+  scope_end = '^%s*end%s*$',
+  scope_end_with_comment = '^%s*end%s+#',
 }
 
 ---@class ScopeFrame
@@ -183,7 +184,7 @@ function M.detect(bufnr)
     end
 
     -- Check for end
-    if match(line, PATTERNS.scope_end) then
+    if match(line, PATTERNS.scope_end) or match(line, PATTERNS.scope_end_with_comment) then
       if #scope_stack > 0 then
         table.remove(scope_stack)
       end
