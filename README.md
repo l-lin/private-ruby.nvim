@@ -10,23 +10,18 @@ Shows private Ruby methods with ghosttext indicators in Neovim.
 {
   'l-lin/private-ruby.nvim',
   ft = 'ruby',
-  opts = {},
-}
-```
-
-## Configuration
-
-```lua
-{
-  indicator = {
-    text = '',             -- Indicator text (max 2 chars for gutter)
-    hl = 'DiagnosticError', -- Highlight group
-    position = 'gutter',    -- 'eol' (end of line) or 'gutter' (sign column)
-    prefix = '',            -- Prefix before indicator (only for eol)
-    -- Optional custom formatter:
-    -- format = function(ctx)
-    --   return ctx.is_singleton and ' class' or ' '
-    -- end,
+  opts = {
+    -- Those are the default values:
+    indicator = {
+      text = '',             -- Indicator text (max 2 chars for gutter)
+      hl = 'DiagnosticError', -- Highlight group
+      position = 'gutter',    -- 'eol' (end of line) or 'gutter' (sign column)
+      prefix = '',            -- Prefix before indicator (only for eol)
+      -- Optional custom formatter:
+      -- format = function(ctx)
+      --   return ctx.is_singleton and ' class' or ' '
+      -- end,
+    },
   },
 }
 ```
@@ -43,7 +38,7 @@ When using a custom `format` function, you receive:
 
 - `:PrivateRubyRefresh` - Manually refresh indicators
 
-## Limitations (v1)
+## Limitations
 
 This version uses regex-based detection. Known limitations:
 
@@ -58,3 +53,7 @@ This version uses regex-based detection. Known limitations:
 mise run test   # Run tests with mini.test
 mise run smoke  # Smoke test: load plugin
 ```
+
+## License
+
+MIT
