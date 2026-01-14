@@ -105,7 +105,10 @@ function M.setup(opts)
 
   -- User command
   vim.api.nvim_create_user_command('PrivateRubyRefresh', function()
-    M.refresh()
+    local bufnr = vim.api.nvim_get_current_buf()
+    if vim.bo[bufnr].filetype == 'ruby' then
+      M.refresh(bufnr)
+    end
   end, { desc = 'Refresh private method indicators' })
 
   -- Apply to any existing Ruby buffers
