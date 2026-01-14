@@ -36,27 +36,11 @@ local defaults = {
 ---@type PrivateRubyConfig
 local config = vim.deepcopy(defaults)
 
---- Deep merge two tables
----@param t1 table Base table
----@param t2 table Override table
----@return table Merged table
-local function deep_merge(t1, t2)
-  local result = vim.deepcopy(t1)
-  for k, v in pairs(t2) do
-    if type(v) == 'table' and type(result[k]) == 'table' then
-      result[k] = deep_merge(result[k], v)
-    else
-      result[k] = v
-    end
-  end
-  return result
-end
-
 --- Setup configuration with user options
 ---@param opts? PrivateRubyConfig User options
 function M.setup(opts)
   opts = opts or {}
-  config = deep_merge(defaults, opts)
+  config = vim.tbl_deep_extend('force', defaults, opts)
 end
 
 --- Get current configuration
