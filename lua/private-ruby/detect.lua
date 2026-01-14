@@ -1,4 +1,4 @@
--- private_ruby/detect.lua
+-- private-ruby/detect.lua
 -- Detect private Ruby methods using regex/line-scan
 
 local M = {}

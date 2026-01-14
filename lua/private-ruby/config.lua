@@ -1,4 +1,4 @@
--- private_ruby/config.lua
+-- private-ruby/config.lua
 -- Configuration management for private-ruby.nvim
 
 local M = {}

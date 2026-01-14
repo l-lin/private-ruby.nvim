@@ -1,4 +1,4 @@
--- private_ruby/render.lua
+-- private-ruby/render.lua
 -- Extmark rendering for private method indicators
 
 local M = {}
