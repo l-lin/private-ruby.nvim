@@ -1,0 +1,178 @@
+-- private_ruby/detect.lua
+-- Detect private Ruby methods using regex/line-scan
+
+local M = {}
+
+---@class PrivateRubyMark
+---@field lnum integer 0-based line number
+---@field method_name string Method name
+---@field is_singleton boolean Whether it's a singleton method
+---@field scope table[] Scope stack
+
+-- Patterns for Ruby constructs
+local PATTERNS = {
+  -- Visibility directives (standalone on a line)
+  private = '^%s*private%s*[#]?.*$',
+  public = '^%s*public%s*[#]?.*$',
+  protected = '^%s*protected%s*[#]?.*$',
+
+  -- Scope openers
+  module = '^%s*module%s+([A-Z][%w_]*)',
+  class = '^%s*class%s+([A-Z][%w_:]*)',
+  singleton_block = '^%s*class%s*<<%s*self%s*',
+
+  -- Method definitions
+  instance_method = '^%s*def%s+([a-zA-Z_][%w_]*[!?=]?)',
+  singleton_method = '^%s*def%s+self%.([a-zA-Z_][%w_]*[!?=]?)',
+
+  -- Scope closer
+  scope_end = '^%s*end%s*',
+}
+
+---@class ScopeFrame
+---@field kind string 'module' | 'class' | 'singleton'
+---@field name? string Name of module/class
+---@field visibility string 'public' | 'protected' | 'private'
+
+--- Create a new scope frame
+---@param kind string
+---@param name? string
+---@return ScopeFrame
+local function new_frame(kind, name)
+  return {
+    kind = kind,
+    name = name,
+    visibility = 'public', -- Default visibility
+  }
+end
+
+--- Check if line matches a pattern and return capture
+---@param line string
+---@param pattern string
+---@return string? capture
+local function match(line, pattern)
+  return line:match(pattern)
+end
+
+--- Detect private methods in a buffer
+---@param bufnr integer Buffer number
+---@return PrivateRubyMark[]
+function M.detect(bufnr)
+  local lines = vim.api.nvim_buf_get_lines(bufnr, 0, -1, false)
+  local marks = {}
+
+  ---@type ScopeFrame[]
+  local scope_stack = {}
+
+  -- Helper to get current visibility
+  local function current_visibility()
+    if #scope_stack == 0 then
+      return 'public'
+    end
+    return scope_stack[#scope_stack].visibility
+  end
+
+  -- Helper to set current visibility
+  local function set_visibility(vis)
+    if #scope_stack > 0 then
+      scope_stack[#scope_stack].visibility = vis
+    end
+  end
+
+  -- Helper to check if we're in a singleton block
+  local function in_singleton_block()
+    for _, frame in ipairs(scope_stack) do
+      if frame.kind == 'singleton' then
+        return true
+      end
+    end
+    return false
+  end
+
+  -- Helper to build scope info for context
+  local function build_scope()
+    local scope = {}
+    for _, frame in ipairs(scope_stack) do
+      table.insert(scope, { kind = frame.kind, name = frame.name })
+    end
+    return scope
+  end
+
+  for i, line in ipairs(lines) do
+    local lnum = i - 1 -- 0-based
+
+    -- Check for module
+    local module_name = match(line, PATTERNS.module)
+    if module_name then
+      table.insert(scope_stack, new_frame('module', module_name))
+      goto continue
+    end
+
+    -- Check for singleton block (class << self) - must check before class
+    if match(line, PATTERNS.singleton_block) then
+      table.insert(scope_stack, new_frame('singleton', nil))
+      goto continue
+    end
+
+    -- Check for class
+    local class_name = match(line, PATTERNS.class)
+    if class_name then
+      table.insert(scope_stack, new_frame('class', class_name))
+      goto continue
+    end
+
+    -- Check for visibility directives
+    if match(line, PATTERNS.private) then
+      set_visibility('private')
+      goto continue
+    end
+    if match(line, PATTERNS.public) then
+      set_visibility('public')
+      goto continue
+    end
+    if match(line, PATTERNS.protected) then
+      set_visibility('protected')
+      goto continue
+    end
+
+    -- Check for singleton method (def self.foo)
+    local singleton_name = match(line, PATTERNS.singleton_method)
+    if singleton_name then
+      -- Singleton methods defined with `def self.foo` are NOT affected by
+      -- instance-level `private` keyword, so we don't mark them here
+      -- (They would need `private_class_method` which is v2)
+      goto continue
+    end
+
+    -- Check for instance method
+    local method_name = match(line, PATTERNS.instance_method)
+    if method_name then
+      local is_private = current_visibility() == 'private'
+      local is_singleton = in_singleton_block()
+
+      if is_private then
+        table.insert(marks, {
+          lnum = lnum,
+          method_name = method_name,
+          is_singleton = is_singleton,
+          scope = build_scope(),
+        })
+      end
+      goto continue
+    end
+
+    -- Check for end
+    if match(line, PATTERNS.scope_end) then
+      if #scope_stack > 0 then
+        table.remove(scope_stack)
+      end
+      goto continue
+    end
+
+    ::continue::
+  end
+
+  return marks
+end
+
+return M
