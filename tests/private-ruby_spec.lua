@@ -158,4 +158,123 @@ T['detect']['singleton.rb']['marks methods inside class << self as singleton'] =
   expect.equality(mark.is_singleton, true)
 end
 
+T['detect']['complex.rb'] = new_set()
+
+T['detect']['complex.rb']['detects all private methods in large file'] = function()
+  -- GIVEN: complex.rb fixture with ~300 lines, multiple nested modules/classes
+  local bufnr = load_fixture('complex.rb')
+  local detect = require('private-ruby.detect')
+
+  -- WHEN: calling detect
+  local marks = detect.detect(bufnr)
+
+  -- THEN: all private methods are detected
+  local method_names = get_method_names(marks)
+
+  -- UserAuthenticator private methods
+  expect.equality(vim.tbl_contains(method_names, 'user_valid?'), true)
+  expect.equality(vim.tbl_contains(method_names, 'password_matches?'), true)
+  expect.equality(vim.tbl_contains(method_names, 'create_session_token'), true)
+  expect.equality(vim.tbl_contains(method_names, 'invalidate_session'), true)
+  expect.equality(vim.tbl_contains(method_names, 'clear_cookies'), true)
+  expect.equality(vim.tbl_contains(method_names, 'session_valid?'), true)
+  expect.equality(vim.tbl_contains(method_names, 'token_not_expired?'), true)
+  expect.equality(vim.tbl_contains(method_names, 'generate_new_token'), true)
+  expect.equality(vim.tbl_contains(method_names, 'store_token_in_redis'), true)
+  expect.equality(vim.tbl_contains(method_names, 'remove_token_from_redis'), true)
+  expect.equality(vim.tbl_contains(method_names, 'redis_token_ttl'), true)
+  expect.equality(vim.tbl_contains(method_names, 'rotate_token'), true)
+  expect.equality(vim.tbl_contains(method_names, 'log_authentication_attempt'), true)
+  expect.equality(vim.tbl_contains(method_names, 'log_token_rotation'), true)
+
+  -- TokenValidator private methods
+  expect.equality(vim.tbl_contains(method_names, 'decode_token'), true)
+  expect.equality(vim.tbl_contains(method_names, 'enhanced_payload'), true)
+  expect.equality(vim.tbl_contains(method_names, 'handle_decode_error'), true)
+  expect.equality(vim.tbl_contains(method_names, 'suspicious_error?'), true)
+  expect.equality(vim.tbl_contains(method_names, 'notify_security_team'), true)
+
+  -- PermissionChecker private methods
+  expect.equality(vim.tbl_contains(method_names, 'has_permission?'), true)
+  expect.equality(vim.tbl_contains(method_names, 'permission_key'), true)
+  expect.equality(vim.tbl_contains(method_names, 'admin?'), true)
+  expect.equality(vim.tbl_contains(method_names, 'admin_or_owner?'), true)
+  expect.equality(vim.tbl_contains(method_names, 'owner?'), true)
+
+  -- RoleManager private methods
+  expect.equality(vim.tbl_contains(method_names, 'valid_role?'), true)
+  expect.equality(vim.tbl_contains(method_names, 'can_assign_role?'), true)
+  expect.equality(vim.tbl_contains(method_names, 'current_role_index'), true)
+  expect.equality(vim.tbl_contains(method_names, 'update_user_role'), true)
+  expect.equality(vim.tbl_contains(method_names, 'clear_permission_cache'), true)
+  expect.equality(vim.tbl_contains(method_names, 'notify_role_change'), true)
+end
+
+T['detect']['complex.rb']['does not detect public methods'] = function()
+  -- GIVEN: complex.rb fixture
+  local bufnr = load_fixture('complex.rb')
+  local detect = require('private-ruby.detect')
+
+  -- WHEN: calling detect
+  local marks = detect.detect(bufnr)
+
+  -- THEN: public methods are NOT marked
+  local method_names = get_method_names(marks)
+
+  -- Public methods should not be in the list
+  expect.equality(vim.tbl_contains(method_names, 'initialize'), false)
+  expect.equality(vim.tbl_contains(method_names, 'authenticate'), false)
+  expect.equality(vim.tbl_contains(method_names, 'logout'), false)
+  expect.equality(vim.tbl_contains(method_names, 'refresh_token'), false)
+  expect.equality(vim.tbl_contains(method_names, 'validate'), false)
+  expect.equality(vim.tbl_contains(method_names, 'generate'), false)
+  expect.equality(vim.tbl_contains(method_names, 'can_read?'), false)
+  expect.equality(vim.tbl_contains(method_names, 'can_write?'), false)
+  expect.equality(vim.tbl_contains(method_names, 'can_delete?'), false)
+  expect.equality(vim.tbl_contains(method_names, 'can_manage?'), false)
+  expect.equality(vim.tbl_contains(method_names, 'assign_role'), false)
+  expect.equality(vim.tbl_contains(method_names, 'promote'), false)
+  expect.equality(vim.tbl_contains(method_names, 'demote'), false)
+  expect.equality(vim.tbl_contains(method_names, 'success?'), false)
+  expect.equality(vim.tbl_contains(method_names, 'failure?'), false)
+  expect.equality(vim.tbl_contains(method_names, 'cache_key'), false)
+  expect.equality(vim.tbl_contains(method_names, 'cached_data'), false)
+  expect.equality(vim.tbl_contains(method_names, 'track_event'), false)
+end
+
+T['detect']['complex.rb']['detects private singleton methods in class << self'] = function()
+  -- GIVEN: complex.rb with ServiceResult class << self block
+  local bufnr = load_fixture('complex.rb')
+  local detect = require('private-ruby.detect')
+
+  -- WHEN: calling detect
+  local marks = detect.detect(bufnr)
+
+  -- THEN: private class methods are detected and marked as singleton
+  local build_mark = find_mark_by_method(marks, 'build_from_exception')
+  local wrap_mark = find_mark_by_method(marks, 'wrap_errors')
+  local normalize_mark = find_mark_by_method(marks, 'normalize_error')
+
+  expect.equality(build_mark ~= nil, true)
+  expect.equality(build_mark.is_singleton, true)
+  expect.equality(wrap_mark ~= nil, true)
+  expect.equality(wrap_mark.is_singleton, true)
+  expect.equality(normalize_mark ~= nil, true)
+  expect.equality(normalize_mark.is_singleton, true)
+end
+
+T['detect']['complex.rb']['returns correct total count'] = function()
+  -- GIVEN: complex.rb fixture
+  local bufnr = load_fixture('complex.rb')
+  local detect = require('private-ruby.detect')
+
+  -- WHEN: calling detect
+  local marks = detect.detect(bufnr)
+
+  -- THEN: total count matches expected private methods
+  -- Count: UserAuthenticator(14) + TokenValidator(5) + PermissionChecker(5) +
+  --        RoleManager(6) + ServiceResult singleton(3) + Cacheable(4) + Trackable(4) = 41
+  expect.equality(#marks, 41)
+end
+
 return T
