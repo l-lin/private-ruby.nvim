@@ -30,7 +30,7 @@ local PATTERNS = {
 }
 
 ---@class ScopeFrame
----@field kind string 'module' | 'class' | 'singleton'
+---@field kind string 'module' | 'class' | 'singleton' | 'method'
 ---@field name? string Name of module/class
 ---@field visibility string 'public' | 'protected' | 'private'
 
@@ -64,18 +64,30 @@ function M.detect(bufnr)
   ---@type ScopeFrame[]
   local scope_stack = {}
 
+  -- Helper to find the nearest non-method scope
+  local function find_enclosing_scope()
+    for i = #scope_stack, 1, -1 do
+      if scope_stack[i].kind ~= 'method' then
+        return scope_stack[i]
+      end
+    end
+    return nil
+  end
+
   -- Helper to get current visibility
   local function current_visibility()
-    if #scope_stack == 0 then
+    local scope = find_enclosing_scope()
+    if not scope then
       return 'public'
     end
-    return scope_stack[#scope_stack].visibility
+    return scope.visibility
   end
 
   -- Helper to set current visibility
   local function set_visibility(vis)
-    if #scope_stack > 0 then
-      scope_stack[#scope_stack].visibility = vis
+    local scope = find_enclosing_scope()
+    if scope then
+      scope.visibility = vis
     end
   end
 
@@ -141,6 +153,8 @@ function M.detect(bufnr)
       -- Singleton methods defined with `def self.foo` are NOT affected by
       -- instance-level `private` keyword, so we don't mark them here
       -- (They would need `private_class_method` which is v2)
+      -- But we still need to track the method scope for proper end matching
+      table.insert(scope_stack, new_frame('method', singleton_name))
       goto continue
     end
 
@@ -158,6 +172,8 @@ function M.detect(bufnr)
           scope = build_scope(),
         })
       end
+      -- Track method scope for proper end matching
+      table.insert(scope_stack, new_frame('method', method_name))
       goto continue
     end
 
