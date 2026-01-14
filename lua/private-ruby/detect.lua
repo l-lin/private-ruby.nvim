@@ -30,6 +30,18 @@ local PATTERNS = {
   block_do_with_comment = '%s+do%s+#',
   block_do_with_pipes = '%s+do%s*|',
 
+  -- Control flow block openers (if/unless/case/begin/while/until/for)
+  -- These all create blocks that end with `end`
+  -- Must be at start of line (with optional indentation) to avoid matching postfix if/unless
+  block_if = '^%s*if%s+',
+  block_unless = '^%s*unless%s+',
+  block_case = '^%s*case[%s$]',
+  block_begin = '^%s*begin%s*$',
+  block_begin_with_comment = '^%s*begin%s+#',
+  block_while = '^%s*while%s+',
+  block_until = '^%s*until%s+',
+  block_for = '^%s*for%s+',
+
   -- Method definitions
   -- Matches: def foo, def foo!, def foo?, def foo=, def +, def [], def []=, etc.
   instance_method = '^%s*def%s+([a-zA-Z_][%w_]*[!?=]?)',
@@ -222,6 +234,21 @@ function M.detect(bufnr)
       line:match(PATTERNS.block_do)
       or line:match(PATTERNS.block_do_with_comment)
       or line:match(PATTERNS.block_do_with_pipes)
+    then
+      table.insert(scope_stack, new_frame('block', nil))
+      goto continue
+    end
+
+    -- Check for control flow blocks (if/unless/case/begin/while/until/for)
+    if
+      line:match(PATTERNS.block_if)
+      or line:match(PATTERNS.block_unless)
+      or line:match(PATTERNS.block_case)
+      or line:match(PATTERNS.block_begin)
+      or line:match(PATTERNS.block_begin_with_comment)
+      or line:match(PATTERNS.block_while)
+      or line:match(PATTERNS.block_until)
+      or line:match(PATTERNS.block_for)
     then
       table.insert(scope_stack, new_frame('block', nil))
       goto continue
