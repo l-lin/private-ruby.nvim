@@ -4,4 +4,4 @@ run = "nvim --headless -u tests/minimal_init.lua -c \"lua require('mini.test').r
 
 [tasks.smoke]
 description = "Smoke test: load plugin without errors"
-run = "nvim --headless -u tests/minimal_init.lua -c \"lua require('private_ruby').setup({})\" -c qa"
+run = "nvim --headless -u tests/minimal_init.lua -c \"lua require('private-ruby').setup({})\" -c qa"

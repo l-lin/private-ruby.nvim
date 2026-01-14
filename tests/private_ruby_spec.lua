@@ -1,4 +1,4 @@
--- Tests for private_ruby.detect module
+-- Tests for private-ruby.detect module
 local MiniTest = require('mini.test')
 local new_set = MiniTest.new_set
 local expect = MiniTest.expect
@@ -40,7 +40,7 @@ T['detect']['basic.rb'] = new_set()
 T['detect']['basic.rb']['detects private methods after private keyword'] = function()
   -- GIVEN: basic.rb fixture with one public method, private section, two private methods
   local bufnr = load_fixture('basic.rb')
-  local detect = require('private_ruby.detect')
+  local detect = require('private-ruby.detect')
 
   -- WHEN: calling detect
   local marks = detect.detect(bufnr)
@@ -56,7 +56,7 @@ end
 T['detect']['basic.rb']['returns correct line numbers'] = function()
   -- GIVEN: basic.rb fixture
   local bufnr = load_fixture('basic.rb')
-  local detect = require('private_ruby.detect')
+  local detect = require('private-ruby.detect')
 
   -- WHEN: calling detect
   local marks = detect.detect(bufnr)
@@ -76,7 +76,7 @@ T['detect']['nested.rb'] = new_set()
 T['detect']['nested.rb']['handles nested class scope correctly'] = function()
   -- GIVEN: nested.rb fixture with module + nested class
   local bufnr = load_fixture('nested.rb')
-  local detect = require('private_ruby.detect')
+  local detect = require('private-ruby.detect')
 
   -- WHEN: calling detect
   local marks = detect.detect(bufnr)
@@ -92,7 +92,7 @@ end
 T['detect']['nested.rb']['private state resets per scope'] = function()
   -- GIVEN: nested.rb where private in InnerClass doesn't leak to OuterModule
   local bufnr = load_fixture('nested.rb')
-  local detect = require('private_ruby.detect')
+  local detect = require('private-ruby.detect')
 
   -- WHEN: calling detect
   local marks = detect.detect(bufnr)
@@ -106,7 +106,7 @@ T['detect']['singleton.rb'] = new_set()
 T['detect']['singleton.rb']['detects private instance methods'] = function()
   -- GIVEN: singleton.rb fixture
   local bufnr = load_fixture('singleton.rb')
-  local detect = require('private_ruby.detect')
+  local detect = require('private-ruby.detect')
 
   -- WHEN: calling detect
   local marks = detect.detect(bufnr)
@@ -120,7 +120,7 @@ end
 T['detect']['singleton.rb']['does not mark def self.x under instance private'] = function()
   -- GIVEN: singleton.rb where "private" in class scope only affects instance methods
   local bufnr = load_fixture('singleton.rb')
-  local detect = require('private_ruby.detect')
+  local detect = require('private-ruby.detect')
 
   -- WHEN: calling detect
   local marks = detect.detect(bufnr)
@@ -134,7 +134,7 @@ end
 T['detect']['singleton.rb']['detects private in class << self block'] = function()
   -- GIVEN: singleton.rb with class << self block containing private
   local bufnr = load_fixture('singleton.rb')
-  local detect = require('private_ruby.detect')
+  local detect = require('private-ruby.detect')
 
   -- WHEN: calling detect
   local marks = detect.detect(bufnr)
@@ -148,7 +148,7 @@ end
 T['detect']['singleton.rb']['marks methods inside class << self as singleton'] = function()
   -- GIVEN: singleton.rb with class << self block
   local bufnr = load_fixture('singleton.rb')
-  local detect = require('private_ruby.detect')
+  local detect = require('private-ruby.detect')
 
   -- WHEN: calling detect
   local marks = detect.detect(bufnr)

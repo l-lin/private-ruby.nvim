@@ -1,9 +1,9 @@
--- private_ruby/init.lua
+-- private-ruby/init.lua
 -- Plugin entrypoint for private-ruby.nvim
 
-local config = require('private_ruby.config')
-local detect = require('private_ruby.detect')
-local render = require('private_ruby.render')
+local config = require('private-ruby.config')
+local detect = require('private-ruby.detect')
+local render = require('private-ruby.render')
 
 local M = {}
 

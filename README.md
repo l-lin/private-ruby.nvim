@@ -18,15 +18,14 @@ Shows private Ruby methods with ghosttext indicators in Neovim.
 
 ```lua
 {
-  enabled = true,
   indicator = {
-    text = '',           -- Indicator text
+    text = '',           -- Indicator text
     hl = 'DiagnosticHint', -- Highlight group
     position = 'eol',      -- Virtual text position
     prefix = '',          -- Prefix before indicator
     -- Optional custom formatter:
     -- format = function(ctx)
-    --   return ctx.is_singleton and ' class' or ' '
+    --   return ctx.is_singleton and ' class' or ' '
     -- end,
   },
 }
