@@ -49,9 +49,4 @@ function M.get()
   return config
 end
 
---- Reset configuration to defaults
-function M.reset()
-  config = vim.deepcopy(defaults)
-end
-
 return M
