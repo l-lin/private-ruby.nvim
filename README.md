@@ -19,10 +19,10 @@ Shows private Ruby methods with ghosttext indicators in Neovim.
 ```lua
 {
   indicator = {
-    text = '',           -- Indicator text (max 2 chars for gutter)
-    hl = 'DiagnosticHint', -- Highlight group
-    position = 'eol',      -- 'eol' (end of line) or 'gutter' (sign column)
-    prefix = '',          -- Prefix before indicator (only for eol)
+    text = '',             -- Indicator text (max 2 chars for gutter)
+    hl = 'DiagnosticError', -- Highlight group
+    position = 'gutter',    -- 'eol' (end of line) or 'gutter' (sign column)
+    prefix = '',            -- Prefix before indicator (only for eol)
     -- Optional custom formatter:
     -- format = function(ctx)
     --   return ctx.is_singleton and ' class' or ' '

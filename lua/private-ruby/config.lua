@@ -27,7 +27,7 @@ local defaults = {
   indicator = {
     text = '',
     hl = 'DiagnosticError',
-    position = 'eol',
+    position = 'gutter',
     prefix = '',
     format = nil,
   },
