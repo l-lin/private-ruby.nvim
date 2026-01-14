@@ -101,11 +101,13 @@ function M.detect(bufnr)
     return false
   end
 
-  -- Helper to build scope info for context
+  -- Helper to build scope info for context (excludes method frames)
   local function build_scope()
     local scope = {}
     for _, frame in ipairs(scope_stack) do
-      table.insert(scope, { kind = frame.kind, name = frame.name })
+      if frame.kind ~= 'method' then
+        table.insert(scope, { kind = frame.kind, name = frame.name })
+      end
     end
     return scope
   end
