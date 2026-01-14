@@ -62,7 +62,15 @@ end
 --- Setup autocmds for a Ruby buffer
 ---@param bufnr integer
 local function setup_buffer_autocmds(bufnr)
-  local group = vim.api.nvim_create_augroup(augroup_name .. bufnr, { clear = true })
+  local group_name = augroup_name .. bufnr
+
+  -- Skip if already setup for this buffer
+  local ok = pcall(vim.api.nvim_get_autocmds, { group = group_name })
+  if ok then
+    return
+  end
+
+  local group = vim.api.nvim_create_augroup(group_name, { clear = true })
 
   -- Refresh on buffer write
   vim.api.nvim_create_autocmd('BufWritePost', {
@@ -78,7 +86,7 @@ local function setup_buffer_autocmds(bufnr)
     group = group,
     buffer = bufnr,
     callback = function()
-      vim.api.nvim_del_augroup_by_name(augroup_name .. bufnr)
+      vim.api.nvim_del_augroup_by_name(group_name)
     end,
   })
 
