@@ -50,14 +50,6 @@ local function new_frame(kind, name)
   }
 end
 
---- Check if line matches a pattern and return capture
----@param line string
----@param pattern string
----@return string? capture
-local function match(line, pattern)
-  return line:match(pattern)
-end
-
 --- Detect private methods in a buffer
 ---@param bufnr integer Buffer number
 ---@return PrivateRubyMark[]
@@ -120,41 +112,41 @@ function M.detect(bufnr)
     local lnum = i - 1 -- 0-based
 
     -- Check for module
-    local module_name = match(line, PATTERNS.module)
+    local module_name = line:match(PATTERNS.module)
     if module_name then
       table.insert(scope_stack, new_frame('module', module_name))
       goto continue
     end
 
     -- Check for singleton block (class << self) - must check before class
-    if match(line, PATTERNS.singleton_block) then
+    if line:match(PATTERNS.singleton_block) then
       table.insert(scope_stack, new_frame('singleton', nil))
       goto continue
     end
 
     -- Check for class
-    local class_name = match(line, PATTERNS.class)
+    local class_name = line:match(PATTERNS.class)
     if class_name then
       table.insert(scope_stack, new_frame('class', class_name))
       goto continue
     end
 
     -- Check for visibility directives
-    if match(line, PATTERNS.private) or match(line, PATTERNS.private_with_comment) then
+    if line:match(PATTERNS.private) or line:match(PATTERNS.private_with_comment) then
       set_visibility('private')
       goto continue
     end
-    if match(line, PATTERNS.public) or match(line, PATTERNS.public_with_comment) then
+    if line:match(PATTERNS.public) or line:match(PATTERNS.public_with_comment) then
       set_visibility('public')
       goto continue
     end
-    if match(line, PATTERNS.protected) or match(line, PATTERNS.protected_with_comment) then
+    if line:match(PATTERNS.protected) or line:match(PATTERNS.protected_with_comment) then
       set_visibility('protected')
       goto continue
     end
 
     -- Check for singleton method (def self.foo)
-    local singleton_name = match(line, PATTERNS.singleton_method)
+    local singleton_name = line:match(PATTERNS.singleton_method)
     if singleton_name then
       -- Singleton methods defined with `def self.foo` are NOT affected by
       -- instance-level `private` keyword, so we don't mark them here
@@ -165,7 +157,7 @@ function M.detect(bufnr)
     end
 
     -- Check for instance method
-    local method_name = match(line, PATTERNS.instance_method)
+    local method_name = line:match(PATTERNS.instance_method)
     if method_name then
       local is_private = current_visibility() == 'private'
       local is_singleton = in_singleton_block()
@@ -184,7 +176,7 @@ function M.detect(bufnr)
     end
 
     -- Check for end
-    if match(line, PATTERNS.scope_end) or match(line, PATTERNS.scope_end_with_comment) then
+    if line:match(PATTERNS.scope_end) or line:match(PATTERNS.scope_end_with_comment) then
       if #scope_stack > 0 then
         table.remove(scope_stack)
       end
