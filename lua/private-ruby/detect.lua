@@ -25,8 +25,13 @@ local PATTERNS = {
   singleton_block = '^%s*class%s*<<%s*self%s*',
 
   -- Method definitions
+  -- Matches: def foo, def foo!, def foo?, def foo=, def +, def [], def []=, etc.
   instance_method = '^%s*def%s+([a-zA-Z_][%w_]*[!?=]?)',
+  instance_method_operator = '^%s*def%s+([%+%-%*/<>=!&|%^~%%]+)',
+  instance_method_indexer = '^%s*def%s+(%[%]=?)',
   singleton_method = '^%s*def%s+self%.([a-zA-Z_][%w_]*[!?=]?)',
+  singleton_method_operator = '^%s*def%s+self%.([%+%-%*/<>=!&|%^~%%]+)',
+  singleton_method_indexer = '^%s*def%s+self%.(%[%]=?)',
 
   -- Scope closer (end as standalone keyword)
   scope_end = '^%s*end%s*$',
@@ -145,8 +150,10 @@ function M.detect(bufnr)
       goto continue
     end
 
-    -- Check for singleton method (def self.foo)
+    -- Check for singleton method (def self.foo, def self.+, def self.[])
     local singleton_name = line:match(PATTERNS.singleton_method)
+      or line:match(PATTERNS.singleton_method_operator)
+      or line:match(PATTERNS.singleton_method_indexer)
     if singleton_name then
       -- Singleton methods defined with `def self.foo` are NOT affected by
       -- instance-level `private` keyword, so we don't mark them here
@@ -156,8 +163,10 @@ function M.detect(bufnr)
       goto continue
     end
 
-    -- Check for instance method
+    -- Check for instance method (def foo, def +, def [])
     local method_name = line:match(PATTERNS.instance_method)
+      or line:match(PATTERNS.instance_method_operator)
+      or line:match(PATTERNS.instance_method_indexer)
     if method_name then
       local is_private = current_visibility() == 'private'
       local is_singleton = in_singleton_block()

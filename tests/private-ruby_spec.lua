@@ -277,4 +277,27 @@ T['detect']['complex.rb']['returns correct total count'] = function()
   expect.equality(#marks, 41)
 end
 
+T['detect']['operators.rb'] = new_set()
+
+T['detect']['operators.rb']['detects private operator methods'] = function()
+  -- GIVEN: operators.rb fixture with operator and indexer methods
+  local bufnr = load_fixture('operators.rb')
+  local detect = require('private-ruby.detect')
+
+  -- WHEN: calling detect
+  local marks = detect.detect(bufnr)
+
+  -- THEN: private operator methods are detected
+  local method_names = get_method_names(marks)
+  expect.equality(vim.tbl_contains(method_names, '-'), true)
+  expect.equality(vim.tbl_contains(method_names, '*'), true)
+  expect.equality(vim.tbl_contains(method_names, '[]='), true)
+  expect.equality(vim.tbl_contains(method_names, '<=>'), true)
+  expect.equality(vim.tbl_contains(method_names, '=='), true)
+
+  -- Public operator methods should not be marked
+  expect.equality(vim.tbl_contains(method_names, '+'), false)
+  expect.equality(vim.tbl_contains(method_names, '[]'), false)
+end
+
 return T
