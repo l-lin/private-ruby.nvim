@@ -1,0 +1,7 @@
+[tasks.test]
+description = "Run tests with mini.test"
+run = "nvim --headless -u tests/minimal_init.lua -c \"lua require('mini.test').run()\" -c qa"
+
+[tasks.smoke]
+description = "Smoke test: load plugin without errors"
+run = "nvim --headless -u tests/minimal_init.lua -c \"lua require('private_ruby').setup({})\" -c qa"
