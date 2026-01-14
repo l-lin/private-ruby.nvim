@@ -1,6 +1,6 @@
 [tasks.test]
 description = "Run tests with mini.test"
-run = "nvim --headless -u tests/minimal_init.lua -c \"lua require('mini.test').run({ collect = { find_files = function() return { 'tests/private_ruby_spec.lua' } end } })\" -c qa"
+run = "nvim --headless -u tests/minimal_init.lua -c \"lua require('mini.test').run({ collect = { find_files = function() return { 'tests/private-ruby_spec.lua' } end } })\" -c qa"
 
 [tasks.smoke]
 description = "Smoke test: load plugin without errors"
