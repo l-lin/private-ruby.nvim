@@ -27,16 +27,25 @@ function M.render(bufnr, marks, cfg)
 
   local ns = get_namespace()
   local indicator = cfg.indicator
+  local is_gutter = indicator.position == 'gutter'
 
   for _, mark in ipairs(marks) do
     local text = mark.text or indicator.text
-    local display_text = indicator.prefix .. text
+    local hl = mark.hl or indicator.hl
 
-    vim.api.nvim_buf_set_extmark(bufnr, ns, mark.lnum, 0, {
-      virt_text = { { display_text, mark.hl or indicator.hl } },
-      virt_text_pos = indicator.position,
-      hl_mode = 'combine',
-    })
+    if is_gutter then
+      vim.api.nvim_buf_set_extmark(bufnr, ns, mark.lnum, 0, {
+        sign_text = text,
+        sign_hl_group = hl,
+      })
+    else
+      local display_text = indicator.prefix .. text
+      vim.api.nvim_buf_set_extmark(bufnr, ns, mark.lnum, 0, {
+        virt_text = { { display_text, hl } },
+        virt_text_pos = indicator.position,
+        hl_mode = 'combine',
+      })
+    end
   end
 end
 

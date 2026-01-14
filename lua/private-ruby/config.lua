@@ -15,8 +15,8 @@ local M = {}
 ---@class PrivateRubyIndicator
 ---@field text string Default indicator text
 ---@field hl string Highlight group
----@field position string Virtual text position ('eol')
----@field prefix string Prefix before indicator
+---@field position string 'eol' | 'gutter'
+---@field prefix string Prefix before indicator (only for eol)
 ---@field format? fun(ctx: PrivateRubyContext): string Custom formatter
 
 ---@class PrivateRubyConfig
