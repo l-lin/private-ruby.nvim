@@ -5,6 +5,14 @@ local M = {}
 
 local NS_NAME = 'private-ruby'
 
+-- Valid virt_text_pos values
+local VALID_VIRT_TEXT_POS = {
+  eol = true,
+  overlay = true,
+  right_align = true,
+  inline = true,
+}
+
 --- Get or create the namespace
 ---@return integer Namespace ID
 local function get_namespace()
@@ -40,9 +48,10 @@ function M.render(bufnr, marks, cfg)
       })
     else
       local display_text = indicator.prefix .. text
+      local virt_pos = VALID_VIRT_TEXT_POS[indicator.position] and indicator.position or 'eol'
       vim.api.nvim_buf_set_extmark(bufnr, ns, mark.lnum, 0, {
         virt_text = { { display_text, hl } },
-        virt_text_pos = indicator.position,
+        virt_text_pos = virt_pos,
         hl_mode = 'combine',
       })
     end
