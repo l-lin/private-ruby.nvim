@@ -54,12 +54,21 @@ end
 local function setup_buffer_autocmds(bufnr)
   local group = vim.api.nvim_create_augroup(augroup_name .. bufnr, { clear = true })
 
-  -- Refresh on buffer read and write
-  vim.api.nvim_create_autocmd({ 'BufReadPost', 'BufWritePost' }, {
+  -- Refresh on buffer write
+  vim.api.nvim_create_autocmd('BufWritePost', {
     group = group,
     buffer = bufnr,
     callback = function()
       M.refresh(bufnr)
+    end,
+  })
+
+  -- Cleanup augroup on buffer delete
+  vim.api.nvim_create_autocmd('BufDelete', {
+    group = group,
+    buffer = bufnr,
+    callback = function()
+      vim.api.nvim_del_augroup_by_name(augroup_name .. bufnr)
     end,
   })
 
