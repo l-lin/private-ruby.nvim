@@ -300,4 +300,40 @@ T['detect']['operators.rb']['detects private operator methods'] = function()
   expect.equality(vim.tbl_contains(method_names, '[]'), false)
 end
 
+T['detect']['endless.rb'] = new_set()
+
+T['detect']['endless.rb']['detects private endless methods'] = function()
+  -- GIVEN: endless.rb fixture with Ruby 3.0 endless method syntax
+  local bufnr = load_fixture('endless.rb')
+  local detect = require('private-ruby.detect')
+
+  -- WHEN: calling detect
+  local marks = detect.detect(bufnr)
+
+  -- THEN: private endless methods are detected
+  local method_names = get_method_names(marks)
+  expect.equality(vim.tbl_contains(method_names, 'private_getter'), true)
+  expect.equality(vim.tbl_contains(method_names, 'private_with_arg'), true)
+  expect.equality(vim.tbl_contains(method_names, 'private_with_args'), true)
+
+  -- Public endless methods should not be marked
+  expect.equality(vim.tbl_contains(method_names, 'public_getter'), false)
+  expect.equality(vim.tbl_contains(method_names, 'public_with_arg'), false)
+end
+
+T['detect']['endless.rb']['scope tracking works after endless methods'] = function()
+  -- GIVEN: endless.rb where regular methods follow endless methods
+  local bufnr = load_fixture('endless.rb')
+  local detect = require('private-ruby.detect')
+
+  -- WHEN: calling detect
+  local marks = detect.detect(bufnr)
+
+  -- THEN: regular_private is still detected (endless methods don't break scope)
+  -- and back_to_public is NOT detected (visibility was reset to public)
+  local method_names = get_method_names(marks)
+  expect.equality(vim.tbl_contains(method_names, 'regular_private'), true)
+  expect.equality(vim.tbl_contains(method_names, 'back_to_public'), false)
+end
+
 return T

@@ -33,6 +33,14 @@ local PATTERNS = {
   singleton_method_operator = '^%s*def%s+self%.([%+%-%*/<>=!&|%^~%%]+)',
   singleton_method_indexer = '^%s*def%s+self%.(%[%]=?)',
 
+  -- Endless method detection (Ruby 3.0+): def foo = expr or def foo(args) = expr
+  -- Pattern: after method name (and optional parens), there's = followed by non-=
+  -- We need to be careful not to match def ==(other) as endless
+  endless_method_simple = '^%s*def%s+[%w_!?]+%s*=%s*[^=]', -- def foo = x
+  endless_method_with_args = '^%s*def%s+[%w_!?]+%b()%s*=%s*[^=]', -- def foo(a) = x
+  endless_singleton_simple = '^%s*def%s+self%.[%w_!?]+%s*=%s*[^=]', -- def self.foo = x
+  endless_singleton_with_args = '^%s*def%s+self%.[%w_!?]+%b()%s*=%s*[^=]', -- def self.foo(a) = x
+
   -- Scope closer (end as standalone keyword)
   scope_end = '^%s*end%s*$',
   scope_end_with_comment = '^%s*end%s+#',
@@ -113,6 +121,16 @@ function M.detect(bufnr)
     return scope
   end
 
+  -- Helper to check if line is an endless method (def foo = expr)
+  local function is_endless_method(line)
+    -- Check for endless method patterns (Ruby 3.0+)
+    -- Must check specific patterns to avoid matching def ==(other)
+    return line:match(PATTERNS.endless_method_simple) ~= nil
+      or line:match(PATTERNS.endless_method_with_args) ~= nil
+      or line:match(PATTERNS.endless_singleton_simple) ~= nil
+      or line:match(PATTERNS.endless_singleton_with_args) ~= nil
+  end
+
   for i, line in ipairs(lines) do
     local lnum = i - 1 -- 0-based
 
@@ -159,7 +177,10 @@ function M.detect(bufnr)
       -- instance-level `private` keyword, so we don't mark them here
       -- (They would need `private_class_method` which is v2)
       -- But we still need to track the method scope for proper end matching
-      table.insert(scope_stack, new_frame('method', singleton_name))
+      -- (unless it's an endless method which has no end)
+      if not is_endless_method(line) then
+        table.insert(scope_stack, new_frame('method', singleton_name))
+      end
       goto continue
     end
 
@@ -170,6 +191,7 @@ function M.detect(bufnr)
     if method_name then
       local is_private = current_visibility() == 'private'
       local is_singleton = in_singleton_block()
+      local endless = is_endless_method(line)
 
       if is_private then
         table.insert(marks, {
@@ -179,8 +201,10 @@ function M.detect(bufnr)
           scope = build_scope(),
         })
       end
-      -- Track method scope for proper end matching
-      table.insert(scope_stack, new_frame('method', method_name))
+      -- Track method scope for proper end matching (unless endless method)
+      if not endless then
+        table.insert(scope_stack, new_frame('method', method_name))
+      end
       goto continue
     end
 
