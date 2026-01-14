@@ -16,11 +16,14 @@ local augroup_name = 'PrivateRuby'
 local function format_mark_text(mark, cfg)
   local indicator = cfg.indicator
   if indicator.format then
-    return indicator.format({
+    local ok, result = pcall(indicator.format, {
       method_name = mark.method_name,
       is_singleton = mark.is_singleton,
       scope = mark.scope,
     })
+    if ok and type(result) == 'string' then
+      return result
+    end
   end
   return indicator.text
 end
