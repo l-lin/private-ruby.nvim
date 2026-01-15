@@ -141,6 +141,18 @@ function M.detect(bufnr)
       return
     end
 
+    -- Handle do_block (for Rails DSLs like `concerning`, `class_methods`, etc.)
+    -- These blocks may use module_eval/class_eval internally, creating isolated visibility
+    if node_type == 'do_block' then
+      local new_stack = vim.deepcopy(scope_stack)
+      table.insert(new_stack, new_frame('block', nil))
+
+      for child in node:iter_children() do
+        walk(child, new_stack)
+      end
+      return
+    end
+
     -- Handle visibility modifiers
     local visibility = get_visibility_modifier(node, bufnr)
     if visibility then

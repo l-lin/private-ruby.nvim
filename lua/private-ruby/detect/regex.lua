@@ -73,11 +73,12 @@ function M.detect(bufnr)
   ---@type ScopeFrame[]
   local scope_stack = {}
 
-  -- Helper to find the nearest non-method/non-block scope
+  -- Helper to find the nearest non-method scope
+  -- Blocks ARE valid visibility scopes (Rails DSLs like `concerning` use them)
   local function find_enclosing_scope()
     for i = #scope_stack, 1, -1 do
       local kind = scope_stack[i].kind
-      if kind ~= 'method' and kind ~= 'block' then
+      if kind ~= 'method' then
         return scope_stack[i]
       end
     end
