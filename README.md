@@ -2,7 +2,7 @@
 
 Shows private Ruby methods with indicators in Neovim.
 
-![showcase](./.github/showcase.png)
+![showcase](./.github/private-ruby.png)
 
 ## Installation
 
