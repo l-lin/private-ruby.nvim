@@ -24,7 +24,7 @@ function M.new_frame(kind, name)
   return {
     kind = kind,
     name = name,
-    visibility = 'public',
+    visibility = "public",
   }
 end
 

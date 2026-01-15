@@ -1,9 +1,9 @@
 -- private-ruby/detect.lua
 -- Detection dispatcher - selects between treesitter and regex backends
 
-local config = require('private-ruby.config')
-local regex = require('private-ruby.detect.regex')
-local treesitter = require('private-ruby.detect.treesitter')
+local config = require("private-ruby.config")
+local regex = require("private-ruby.detect.regex")
+local treesitter = require("private-ruby.detect.treesitter")
 
 local M = {}
 
@@ -16,7 +16,7 @@ function M.detect(bufnr)
   local kind = cfg.detect.kind
 
   -- Explicit regex mode
-  if kind == 'regex' then
+  if kind == "regex" then
     return regex.detect(bufnr)
   end
 

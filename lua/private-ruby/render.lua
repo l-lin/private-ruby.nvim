@@ -7,10 +7,10 @@ local NS_NAME = "private-ruby"
 
 -- Map our config position names to nvim's virt_text_pos values
 local POSITION_TO_VIRT_TEXT_POS = {
-  virtual_text = 'eol',
-  overlay = 'overlay',
-  right_align = 'right_align',
-  inline = 'inline',
+  virtual_text = "eol",
+  overlay = "overlay",
+  right_align = "right_align",
+  inline = "inline",
 }
 
 --- Get or create the namespace
@@ -47,7 +47,7 @@ function M.render(bufnr, marks, cfg)
         sign_hl_group = hl,
       })
     else
-      local virt_pos = POSITION_TO_VIRT_TEXT_POS[indicator.position] or 'eol'
+      local virt_pos = POSITION_TO_VIRT_TEXT_POS[indicator.position] or "eol"
       vim.api.nvim_buf_set_extmark(bufnr, ns, mark.lnum, 0, {
         virt_text = { { text, hl } },
         virt_text_pos = virt_pos,

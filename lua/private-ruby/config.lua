@@ -1,19 +1,19 @@
 -- private-ruby/config.lua
 -- Configuration management for private-ruby.nvim
 
-require('private-ruby.types') -- Load type definitions
+require("private-ruby.types") -- Load type definitions
 
 local M = {}
 
 ---@type PrivateRubyConfig
 local defaults = {
   indicator = {
-    text = '',
-    hl = 'DiagnosticHint',
-    position = 'virtual_text',
+    text = "",
+    hl = "DiagnosticHint",
+    position = "virtual_text",
   },
   detect = {
-    kind = 'treesitter',
+    kind = "treesitter",
   },
 }
 
@@ -25,14 +25,14 @@ local config = vim.deepcopy(defaults)
 function M.setup(opts)
   opts = opts or {}
   -- Ensure opts.indicator is a table (or nil) to avoid tbl_deep_extend errors
-  if opts.indicator ~= nil and type(opts.indicator) ~= 'table' then
+  if opts.indicator ~= nil and type(opts.indicator) ~= "table" then
     opts.indicator = nil
   end
   -- Ensure opts.detect is a table (or nil) to avoid tbl_deep_extend errors
-  if opts.detect ~= nil and type(opts.detect) ~= 'table' then
+  if opts.detect ~= nil and type(opts.detect) ~= "table" then
     opts.detect = nil
   end
-  config = vim.tbl_deep_extend('force', defaults, opts)
+  config = vim.tbl_deep_extend("force", defaults, opts)
 
   -- Validate detect.kind
   local valid_kinds = { treesitter = true, regex = true, auto = true }

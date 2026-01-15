@@ -1,13 +1,13 @@
 -- private-ruby/init.lua
 -- Plugin entrypoint for private-ruby.nvim
 
-local config = require('private-ruby.config')
-local detect = require('private-ruby.detect')
-local render = require('private-ruby.render')
+local config = require("private-ruby.config")
+local detect = require("private-ruby.detect")
+local render = require("private-ruby.render")
 
 local M = {}
 
-local augroup_name = 'PrivateRuby'
+local augroup_name = "PrivateRuby"
 
 --- Refresh private method indicators for a buffer
 ---@param bufnr? integer Buffer number (defaults to current)
@@ -54,7 +54,7 @@ local function setup_buffer_autocmds(bufnr)
   local group = vim.api.nvim_create_augroup(group_name, { clear = true })
 
   -- Refresh on buffer write
-  vim.api.nvim_create_autocmd('BufWritePost', {
+  vim.api.nvim_create_autocmd("BufWritePost", {
     group = group,
     buffer = bufnr,
     callback = function()
@@ -63,7 +63,7 @@ local function setup_buffer_autocmds(bufnr)
   })
 
   -- Cleanup augroup on buffer delete
-  vim.api.nvim_create_autocmd('BufDelete', {
+  vim.api.nvim_create_autocmd("BufDelete", {
     group = group,
     buffer = bufnr,
     callback = function()
@@ -84,38 +84,38 @@ function M.setup(opts)
   vim.api.nvim_create_augroup(augroup_name, { clear = true })
 
   -- Setup for Ruby filetypes
-  vim.api.nvim_create_autocmd('FileType', {
+  vim.api.nvim_create_autocmd("FileType", {
     group = augroup_name,
-    pattern = 'ruby',
+    pattern = "ruby",
     callback = function(args)
       setup_buffer_autocmds(args.buf)
     end,
   })
 
   -- User commands (only create if they don't exist)
-  if vim.fn.exists(':PrivateRubyRefresh') == 0 then
-    vim.api.nvim_create_user_command('PrivateRubyRefresh', function()
+  if vim.fn.exists(":PrivateRubyRefresh") == 0 then
+    vim.api.nvim_create_user_command("PrivateRubyRefresh", function()
       local bufnr = vim.api.nvim_get_current_buf()
-      if vim.bo[bufnr].filetype == 'ruby' then
+      if vim.bo[bufnr].filetype == "ruby" then
         M.refresh(bufnr)
       end
-    end, { desc = 'Refresh private method indicators' })
+    end, { desc = "Refresh private method indicators" })
   end
 
-  if vim.fn.exists(':PrivateRubyClear') == 0 then
-    vim.api.nvim_create_user_command('PrivateRubyClear', function()
+  if vim.fn.exists(":PrivateRubyClear") == 0 then
+    vim.api.nvim_create_user_command("PrivateRubyClear", function()
       local bufnr = vim.api.nvim_get_current_buf()
-      if vim.bo[bufnr].filetype == 'ruby' then
+      if vim.bo[bufnr].filetype == "ruby" then
         M.clear(bufnr)
       end
-    end, { desc = 'Clear private method indicators' })
+    end, { desc = "Clear private method indicators" })
   end
 
   -- Apply to any existing Ruby buffers
   for _, bufnr in ipairs(vim.api.nvim_list_bufs()) do
     if vim.api.nvim_buf_is_loaded(bufnr) then
       local ft = vim.bo[bufnr].filetype
-      if ft == 'ruby' then
+      if ft == "ruby" then
         setup_buffer_autocmds(bufnr)
       end
     end
