@@ -1,25 +1,9 @@
 -- private-ruby/config.lua
 -- Configuration management for private-ruby.nvim
 
+require('private-ruby.types') -- Load type definitions
+
 local M = {}
-
----@class PrivateRubyScope
----@field kind string 'module' | 'class' | 'singleton'
----@field name? string Name of module/class
-
----@class PrivateRubyContext
----@field method_name string Method name
----@field is_singleton boolean Whether it's a singleton method
----@field scope PrivateRubyScope[] Enclosing scopes
-
----@class PrivateRubyIndicator
----@field text string Default indicator text
----@field hl string Highlight group
----@field position string 'eol' | 'gutter'
----@field prefix string Prefix before indicator (only for eol)
-
----@class PrivateRubyConfig
----@field indicator PrivateRubyIndicator Indicator options
 
 ---@type PrivateRubyConfig
 local defaults = {
@@ -28,6 +12,9 @@ local defaults = {
     hl = 'DiagnosticHint',
     position = 'gutter',
     prefix = '',
+  },
+  detect = {
+    kind = 'treesitter',
   },
 }
 
@@ -42,7 +29,17 @@ function M.setup(opts)
   if opts.indicator ~= nil and type(opts.indicator) ~= 'table' then
     opts.indicator = nil
   end
+  -- Ensure opts.detect is a table (or nil) to avoid tbl_deep_extend errors
+  if opts.detect ~= nil and type(opts.detect) ~= 'table' then
+    opts.detect = nil
+  end
   config = vim.tbl_deep_extend('force', defaults, opts)
+
+  -- Validate detect.kind
+  local valid_kinds = { treesitter = true, regex = true, auto = true }
+  if not valid_kinds[config.detect.kind] then
+    config.detect.kind = defaults.detect.kind
+  end
 end
 
 --- Get current configuration

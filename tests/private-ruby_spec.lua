@@ -359,4 +359,92 @@ T['detect']['blocks.rb']['do/end blocks do not break scope tracking'] = function
   expect.equality(#marks, 3)
 end
 
+T['detector'] = new_set()
+
+T['detector']['config selection'] = new_set()
+
+T['detector']['config selection']['regex mode uses regex detector'] = function()
+  -- GIVEN: config set to regex mode
+  local config = require('private-ruby.config')
+  config.setup({ detect = { kind = 'regex' } })
+
+  local bufnr = load_fixture('basic.rb')
+  local detect = require('private-ruby.detect')
+
+  -- WHEN: calling detect
+  local marks = detect.detect(bufnr)
+
+  -- THEN: detection works (regex path)
+  expect.equality(#marks, 2)
+  local method_names = get_method_names(marks)
+  expect.equality(vim.tbl_contains(method_names, 'private_method_one'), true)
+  expect.equality(vim.tbl_contains(method_names, 'private_method_two'), true)
+
+  -- Reset config
+  config.setup({})
+end
+
+T['detector']['config selection']['treesitter mode uses treesitter detector'] = function()
+  -- GIVEN: config set to treesitter mode (default)
+  local config = require('private-ruby.config')
+  config.setup({ detect = { kind = 'treesitter' } })
+
+  local bufnr = load_fixture('basic.rb')
+  local detect = require('private-ruby.detect')
+
+  -- WHEN: calling detect
+  local marks = detect.detect(bufnr)
+
+  -- THEN: detection works (treesitter path when available, regex fallback otherwise)
+  expect.equality(#marks, 2)
+  local method_names = get_method_names(marks)
+  expect.equality(vim.tbl_contains(method_names, 'private_method_one'), true)
+  expect.equality(vim.tbl_contains(method_names, 'private_method_two'), true)
+
+  -- Reset config
+  config.setup({})
+end
+
+T['detector']['config selection']['auto mode falls back to regex when treesitter unavailable'] = function()
+  -- GIVEN: config set to auto mode and treesitter forced to fail
+  local config = require('private-ruby.config')
+  config.setup({ detect = { kind = 'auto' } })
+
+  -- Temporarily make treesitter unavailable by mocking
+  local ts_detect = require('private-ruby.detect.treesitter')
+  local original_detect = ts_detect.detect
+  ts_detect.detect = function()
+    return nil
+  end
+
+  local bufnr = load_fixture('basic.rb')
+  local detect = require('private-ruby.detect')
+
+  -- WHEN: calling detect (should fallback to regex)
+  local marks = detect.detect(bufnr)
+
+  -- THEN: detection still works via regex fallback
+  expect.equality(#marks, 2)
+  local method_names = get_method_names(marks)
+  expect.equality(vim.tbl_contains(method_names, 'private_method_one'), true)
+  expect.equality(vim.tbl_contains(method_names, 'private_method_two'), true)
+
+  -- Restore original
+  ts_detect.detect = original_detect
+  config.setup({})
+end
+
+T['detector']['config selection']['invalid config kind falls back to default'] = function()
+  -- GIVEN: config with invalid kind
+  local config = require('private-ruby.config')
+  config.setup({ detect = { kind = 'invalid_value' } })
+
+  -- THEN: kind should be reset to default
+  local cfg = config.get()
+  expect.equality(cfg.detect.kind, 'treesitter')
+
+  -- Reset config
+  config.setup({})
+end
+
 return T
