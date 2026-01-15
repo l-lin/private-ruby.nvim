@@ -17,7 +17,6 @@ local M = {}
 ---@field hl string Highlight group
 ---@field position string 'eol' | 'gutter'
 ---@field prefix string Prefix before indicator (only for eol)
----@field format? fun(ctx: PrivateRubyContext): string Custom formatter
 
 ---@class PrivateRubyConfig
 ---@field indicator PrivateRubyIndicator Indicator options
@@ -29,7 +28,6 @@ local defaults = {
     hl = 'DiagnosticHint',
     position = 'gutter',
     prefix = '',
-    format = nil,
   },
 }
 

@@ -17,22 +17,10 @@ Shows private Ruby methods with ghosttext indicators in Neovim.
       hl = 'DiagnosticHint', -- Highlight group
       position = 'gutter',    -- 'eol' (end of line) or 'gutter' (sign column)
       prefix = '',            -- Prefix before indicator (only for eol)
-      -- Optional custom formatter:
-      -- format = function(ctx)
-      --   return ctx.is_singleton and ' class' or ' '
-      -- end,
     },
   },
 }
 ```
-
-### Format function context
-
-When using a custom `format` function, you receive:
-
-- `ctx.method_name` - Method name (string)
-- `ctx.is_singleton` - Whether it's a singleton method (boolean)
-- `ctx.scope` - Array of `{kind, name}` for enclosing scopes
 
 ## Commands
 

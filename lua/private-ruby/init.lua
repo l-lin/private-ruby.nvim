@@ -9,25 +9,6 @@ local M = {}
 
 local augroup_name = 'PrivateRuby'
 
---- Format a mark's text using config
----@param mark table Mark from detect
----@param cfg table Config
----@return string
-local function format_mark_text(mark, cfg)
-  local indicator = cfg.indicator
-  if indicator.format then
-    local ok, result = pcall(indicator.format, {
-      method_name = mark.method_name,
-      is_singleton = mark.is_singleton,
-      scope = mark.scope,
-    })
-    if ok and type(result) == 'string' then
-      return result
-    end
-  end
-  return indicator.text
-end
-
 --- Refresh private method indicators for a buffer
 ---@param bufnr? integer Buffer number (defaults to current)
 function M.refresh(bufnr)
@@ -42,7 +23,7 @@ function M.refresh(bufnr)
 
   -- Format marks with text
   for _, mark in ipairs(marks) do
-    mark.text = format_mark_text(mark, cfg)
+    mark.text = cfg.indicator.text
     mark.hl = cfg.indicator.hl
   end
 
