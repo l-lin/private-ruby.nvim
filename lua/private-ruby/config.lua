@@ -11,7 +11,6 @@ local defaults = {
     text = '',
     hl = 'DiagnosticHint',
     position = 'gutter',
-    prefix = '',
   },
   detect = {
     kind = 'treesitter',

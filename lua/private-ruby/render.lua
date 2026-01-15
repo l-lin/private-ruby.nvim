@@ -46,14 +46,13 @@ function M.render(bufnr, marks, cfg)
         sign_text = text,
         sign_hl_group = hl,
       })
-    else
-      local display_text = indicator.prefix .. text
-      local virt_pos = VALID_VIRT_TEXT_POS[indicator.position] and indicator.position or 'eol'
-      vim.api.nvim_buf_set_extmark(bufnr, ns, mark.lnum, 0, {
-        virt_text = { { display_text, hl } },
-        virt_text_pos = virt_pos,
-        hl_mode = 'combine',
-      })
+     else
+       local virt_pos = VALID_VIRT_TEXT_POS[indicator.position] and indicator.position or 'eol'
+       vim.api.nvim_buf_set_extmark(bufnr, ns, mark.lnum, 0, {
+         virt_text = { { text, hl } },
+         virt_text_pos = virt_pos,
+         hl_mode = 'combine',
+       })
     end
   end
 end

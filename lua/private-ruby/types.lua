@@ -14,7 +14,6 @@
 ---@field text string Default indicator text
 ---@field hl string Highlight group
 ---@field position string 'eol' | 'gutter'
----@field prefix string Prefix before indicator (only for eol)
 
 ---@class PrivateRubyDetect
 ---@field kind string 'treesitter' | 'regex' | 'auto'
