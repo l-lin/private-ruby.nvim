@@ -1,6 +1,8 @@
 # private-ruby.nvim
 
-Shows private Ruby methods with ghosttext indicators in Neovim.
+Shows private Ruby methods with indicators in Neovim.
+
+![showcase](./.github/showcase.png)
 
 ## Installation
 
@@ -37,6 +39,7 @@ The `detect.kind` option controls how private methods are detected:
 ## Commands
 
 - `:PrivateRubyRefresh` - Manually refresh indicators
+- `:PrivateRubyClear` - Manually clear indicators
 
 ## Limitations
 
