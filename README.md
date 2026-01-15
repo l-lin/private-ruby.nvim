@@ -13,16 +13,26 @@ Shows private Ruby methods with ghosttext indicators in Neovim.
   opts = {
     -- Those are the default values:
     indicator = {
-      text = '',             -- Indicator text (max 2 chars for gutter)
-      hl = 'DiagnosticHint',  -- Highlight group
-      position = 'gutter',    -- 'virtual_text' or 'gutter'
+      text = '',                -- Indicator text (max 2 chars for gutter)
+      hl = 'DiagnosticHint',    -- Highlight group
+      position = 'virtual_text', -- 'virtual_text' or 'gutter'
     },
     detect = {
-      kind = 'treesitter',    -- 'treesitter' or 'regex' or 'auto'
+      kind = 'auto',          -- Detection mode (see below)
     },
   },
 }
 ```
+
+### Detection Modes
+
+The `detect.kind` option controls how private methods are detected:
+
+| Mode | Behavior | Use When |
+|------|----------|----------|
+| `auto` | Try Tree-sitter first, fallback to regex if unavailable | Default - works everywhere |
+| `treesitter` | Use only Tree-sitter, no fallback (returns empty if unavailable) | You want accurate detection and have Tree-sitter installed |
+| `regex` | Use only regex-based detection, no fallback | Tree-sitter is unavailable or you prefer regex |
 
 ## Commands
 

@@ -13,7 +13,7 @@ local defaults = {
     position = "virtual_text",
   },
   detect = {
-    kind = "treesitter",
+    kind = "auto",
   },
 }
 

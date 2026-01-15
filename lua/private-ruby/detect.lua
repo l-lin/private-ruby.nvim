@@ -15,18 +15,20 @@ function M.detect(bufnr)
   local cfg = config.get()
   local kind = cfg.detect.kind
 
-  -- Explicit regex mode
+  -- Explicit regex mode - no fallback
   if kind == "regex" then
     return regex.detect(bufnr)
   end
 
-  -- treesitter or auto: try TS first, fallback to regex
   local marks = treesitter.detect(bufnr)
   if marks then
     return marks
+  elseif kind == "treesitter" then
+    -- Explicit treesitter mode - no fallback, return empty if unavailable
+    return {}
   end
 
-  -- Fallback to regex
+  -- Auto mode: fallback to regex
   return regex.detect(bufnr)
 end
 

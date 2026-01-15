@@ -441,7 +441,7 @@ T['detector']['config selection']['invalid config kind falls back to default'] =
 
   -- THEN: kind should be reset to default
   local cfg = config.get()
-  expect.equality(cfg.detect.kind, 'treesitter')
+  expect.equality(cfg.detect.kind, 'auto')
 
   -- Reset config
   config.setup({})
