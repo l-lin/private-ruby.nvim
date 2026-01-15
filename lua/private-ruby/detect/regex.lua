@@ -51,9 +51,11 @@ local PATTERNS = {
   -- Endless method detection (Ruby 3.0+): def foo = expr or def foo(args) = expr
   -- Pattern: after method name (and optional parens), there's = followed by non-=
   -- We need to be careful not to match def ==(other) as endless
-  endless_method_simple = '^%s*def%s+[%w_!?]+%s*=%s*[^=]', -- def foo = x
+  -- We also need to avoid matching setter methods like def foo=(value)
+  -- Endless methods require whitespace before the = (def foo = x)
+  endless_method_simple = '^%s*def%s+[%w_!?]+%s+=%s*[^=]', -- def foo = x (note: %s+ not %s*)
   endless_method_with_args = '^%s*def%s+[%w_!?]+%b()%s*=%s*[^=]', -- def foo(a) = x
-  endless_singleton_simple = '^%s*def%s+self%.[%w_!?]+%s*=%s*[^=]', -- def self.foo = x
+  endless_singleton_simple = '^%s*def%s+self%.[%w_!?]+%s+=%s*[^=]', -- def self.foo = x
   endless_singleton_with_args = '^%s*def%s+self%.[%w_!?]+%b()%s*=%s*[^=]', -- def self.foo(a) = x
 
   -- Scope closer (end as standalone keyword)
