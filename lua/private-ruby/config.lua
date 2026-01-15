@@ -10,7 +10,7 @@ local defaults = {
   indicator = {
     text = '',
     hl = 'DiagnosticHint',
-    position = 'gutter',
+    position = 'virtual_text',
   },
   detect = {
     kind = 'treesitter',

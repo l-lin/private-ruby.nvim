@@ -13,7 +13,7 @@
 ---@class PrivateRubyIndicator
 ---@field text string Default indicator text
 ---@field hl string Highlight group
----@field position string 'eol' | 'gutter'
+---@field position string 'virtual_text' | 'gutter'
 
 ---@class PrivateRubyDetect
 ---@field kind string 'treesitter' | 'regex' | 'auto'

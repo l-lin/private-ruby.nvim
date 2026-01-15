@@ -3,14 +3,14 @@
 
 local M = {}
 
-local NS_NAME = 'private-ruby'
+local NS_NAME = "private-ruby"
 
--- Valid virt_text_pos values
-local VALID_VIRT_TEXT_POS = {
-  eol = true,
-  overlay = true,
-  right_align = true,
-  inline = true,
+-- Map our config position names to nvim's virt_text_pos values
+local POSITION_TO_VIRT_TEXT_POS = {
+  virtual_text = 'eol',
+  overlay = 'overlay',
+  right_align = 'right_align',
+  inline = 'inline',
 }
 
 --- Get or create the namespace
@@ -35,7 +35,7 @@ function M.render(bufnr, marks, cfg)
 
   local ns = get_namespace()
   local indicator = cfg.indicator
-  local is_gutter = indicator.position == 'gutter'
+  local is_gutter = indicator.position == "gutter"
 
   for _, mark in ipairs(marks) do
     local text = mark.text or indicator.text
@@ -46,13 +46,13 @@ function M.render(bufnr, marks, cfg)
         sign_text = text,
         sign_hl_group = hl,
       })
-     else
-       local virt_pos = VALID_VIRT_TEXT_POS[indicator.position] and indicator.position or 'eol'
-       vim.api.nvim_buf_set_extmark(bufnr, ns, mark.lnum, 0, {
-         virt_text = { { text, hl } },
-         virt_text_pos = virt_pos,
-         hl_mode = 'combine',
-       })
+    else
+      local virt_pos = POSITION_TO_VIRT_TEXT_POS[indicator.position] or 'eol'
+      vim.api.nvim_buf_set_extmark(bufnr, ns, mark.lnum, 0, {
+        virt_text = { { text, hl } },
+        virt_text_pos = virt_pos,
+        hl_mode = "combine",
+      })
     end
   end
 end

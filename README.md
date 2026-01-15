@@ -15,7 +15,7 @@ Shows private Ruby methods with ghosttext indicators in Neovim.
     indicator = {
       text = '',             -- Indicator text (max 2 chars for gutter)
       hl = 'DiagnosticHint', -- Highlight group
-      position = 'gutter',    -- 'eol' (end of line) or 'gutter' (sign column)
+      position = 'gutter',    -- 'virtual_text' (end of line) or 'gutter' (sign column)
     },
   },
 }
